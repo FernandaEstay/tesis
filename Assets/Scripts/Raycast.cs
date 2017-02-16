@@ -21,10 +21,10 @@ public class Raycast : MonoBehaviour {
         RaycastHit hit;
         if (Input.GetMouseButton(0))
         {
-            if(Physics.Raycast(ray, out hit) == true)
+            if (Physics.Raycast(ray, out hit) == true)
             {
-                Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
-                Debug.Log("El rayo toca con " + hit.transform.gameObject.tag);
+                /*Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
+                Debug.Log("El rayo toca con " + hit.transform.gameObject.tag);*/
             }
         }
     }

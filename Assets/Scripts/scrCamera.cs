@@ -9,6 +9,7 @@ public class scrCamera : MonoBehaviour {
     private Vector3 posInicial;
     private Vector3 posfinal;
     private Vector3 pos;
+    private GameObject[] containers;
     public Button btNext;
     public Button btBack;
 
@@ -44,12 +45,24 @@ public class scrCamera : MonoBehaviour {
 
     public void NextOnClicEvent()
     {
+        containers = GameObject.FindGameObjectsWithTag("container");
+        foreach(GameObject cont in containers)
+        {
+            Vector3 contPos = new Vector3(cont.transform.position.x + 156f, cont.transform.position.y, cont.transform.position.z);
+            cont.transform.position = contPos;
+        }
         pos = Camera.main.transform.position;
         pos.Set(pos.x + 156f, pos.y, pos.z);
         Camera.main.transform.position = pos;
     }
     public void BackOnClicEvent()
     {
+        containers = GameObject.FindGameObjectsWithTag("container");
+        foreach (GameObject cont in containers)
+        {
+            Vector3 contPos = new Vector3(cont.transform.position.x - 156f, cont.transform.position.y, cont.transform.position.z);
+            cont.transform.position = contPos;
+        }
         pos = Camera.main.transform.position;
         pos.Set(pos.x - 156f, pos.y, pos.z);
         Camera.main.transform.position = pos;
