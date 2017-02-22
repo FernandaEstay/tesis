@@ -7,32 +7,31 @@ public class Raycast : MonoBehaviour {
     private Vector3 dist;
     private float posX;
     private float posY;
+    private Vector3 posInicial;
 
-	// Use this for initialization
-	void Start () {
-		
+    // Use this for initialization
+    void Start () {
+        posInicial = transform.position;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * 100, Color.cyan);
-
-        RaycastHit hit;
-        if (Input.GetMouseButton(0))
-        {
-            if (Physics.Raycast(ray, out hit) == true)
-            {
-                /*Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
-                Debug.Log("El rayo toca con " + hit.transform.gameObject.tag);*/
-            }
-        }
+	void Update ()
+    {
+       
     }
+    
     private void OnMouseDown()
     {
         dist = Camera.main.WorldToScreenPoint(transform.position);
         posX = Input.mousePosition.x - dist.x;
         posY = Input.mousePosition.y - dist.y;
+
+    }
+    private void OnMouseUp()
+    {
+        transform.position = posInicial;
+        Vector3 scalePhoto = new Vector3(10, 10, 1);
+        transform.localScale = scalePhoto;
     }
 
     private void OnMouseDrag()
@@ -40,5 +39,16 @@ public class Raycast : MonoBehaviour {
         Vector3 curPos = new Vector3(Input.mousePosition.x - posX, Input.mousePosition.y - posY, dist.z);
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(curPos);
         transform.position = worldPos;
+        Vector3 scalePhoto = new Vector3(5, 5, 1);
+        transform.localScale = scalePhoto;
+    }
+    private void Zoom()
+    {
+
     }
 }
+
+
+
+
+

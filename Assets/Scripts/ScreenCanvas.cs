@@ -7,7 +7,8 @@ public class ScreenCanvas : MonoBehaviour {
 
     public Text txtTime;
     private float time;
-
+    float min;
+    float seg;
 
     // Use this for initialization
     void Start () {
@@ -19,7 +20,9 @@ public class ScreenCanvas : MonoBehaviour {
     void Update()
     {
         time += Time.deltaTime;
-        txtTime.text = "Tiempo: " + time.ToString("F1");
+        min = Mathf.Floor(time / 60);
+        seg = time % 60;
+        txtTime.text = "Tiempo: " + min.ToString() + ":" + Mathf.RoundToInt(seg).ToString();
     }
 
 
