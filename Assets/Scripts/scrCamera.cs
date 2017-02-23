@@ -6,53 +6,61 @@ using UnityEngine.UI;
 
 public class scrCamera : MonoBehaviour {
 
+    public Button btNext;
+    public Button btBack;
+
+    private Camera mainCamera;
+    private Camera zoomCamera;
     private Vector3 posInicial;
     private Vector3 posfinal;
     private Vector3 pos;
     private GameObject[] containers;
-    public Button btNext;
-    public Button btBack;
-    /*
-    private static readonly float PanSpeed = 20f;
-    private static readonly float ZoomSpeedMouse = 10f;
 
-    private static readonly float[] BoundsX = new float[] { 0f, 200f };
-    private static readonly float[] BoundsZ = new float[] { -18f, -4f };
-    private static readonly float[] ZoomBounds = new float[] { 0f, 200f };
-
-    private Camera cam;
-
-    private Vector3 lastPanPosition;
-    */
     // Use this for initialization
     void Start () {
-        posInicial = Camera.main.transform.position;
+        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        zoomCamera = GameObject.Find("Zoom Camera").GetComponent<Camera>();
+
+        posInicial = mainCamera.transform.position;
         posfinal.Set(posInicial.x + (156f * 3f), posInicial.y, posInicial.z);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        //HandleMouse();
-        if (posInicial == Camera.main.transform.position)
+        if (mainCamera.enabled == true)
         {
-            btBack.gameObject.SetActive(false);
-        }
-        else if(posfinal == Camera.main.transform.position)
-        {
-            btNext.gameObject.SetActive(false);
-        }
-        else
-        {
-            if (!btNext.IsActive())
+            if (posInicial == mainCamera.transform.position)
             {
+                btBack.gameObject.SetActive(false);
                 btNext.gameObject.SetActive(true);
             }
-            if (!btBack.IsActive())
+            else if (posfinal == mainCamera.transform.position)
             {
+                btNext.gameObject.SetActive(false);
+                btBack.gameObject.SetActive(true);
+            }
+            else
+            {
+                btNext.gameObject.SetActive(true);
                 btBack.gameObject.SetActive(true);
             }
         }
-	}
+        else
+        {
+            btBack.gameObject.SetActive(false);
+            btNext.gameObject.SetActive(false);
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            Zoom();
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            zoomCamera.enabled = false;
+            mainCamera.enabled = true;
+        }
+    }
 
     public void NextOnClicEvent()
     {
@@ -62,9 +70,9 @@ public class scrCamera : MonoBehaviour {
             Vector3 contPos = new Vector3(cont.transform.position.x + 156f, cont.transform.position.y, cont.transform.position.z);
             cont.transform.position = contPos;
         }
-        pos = Camera.main.transform.position;
+        pos = mainCamera.transform.position;
         pos.Set(pos.x + 156f, pos.y, pos.z);
-        Camera.main.transform.position = pos;
+        mainCamera.transform.position = pos;
     }
     public void BackOnClicEvent()
     {
@@ -74,55 +82,21 @@ public class scrCamera : MonoBehaviour {
             Vector3 contPos = new Vector3(cont.transform.position.x - 156f, cont.transform.position.y, cont.transform.position.z);
             cont.transform.position = contPos;
         }
-        pos = Camera.main.transform.position;
+        pos = mainCamera.transform.position;
         pos.Set(pos.x - 156f, pos.y, pos.z);
-        Camera.main.transform.position = pos;
-    }/*
-    void Awake()
-    {
-        cam = GetComponent<Camera>();
+        mainCamera.transform.position = pos;
     }
-    void HandleMouse()
+    private void Zoom()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            lastPanPosition = Input.mousePosition;
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            PanCamera(Input.mousePosition);
-        }
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Debug.DrawRay(ray.origin, ray.direction * 100, Color.cyan);
+        RaycastHit hit;
 
-        // Check for scrolling to zoom the camera
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        ZoomCamera(scroll, ZoomSpeedMouse);
+        if (Physics.Raycast(ray, out hit) == true)
+        {
+            mainCamera.enabled = false;
+            zoomCamera.enabled = true;
+            zoomCamera.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -10f);
+        }
     }
-    void PanCamera(Vector3 newPanPosition)
-    {
-        // Determine how much to move the camera
-        Vector3 offset = cam.ScreenToViewportPoint(lastPanPosition - newPanPosition);
-        Vector3 move = new Vector3(offset.x * PanSpeed, 0, offset.y * PanSpeed);
-
-        // Perform the movement
-        transform.Translate(move, Space.World);
-
-        // Ensure the camera remains within bounds.
-        Vector3 pos = transform.position;
-        pos.x = Mathf.Clamp(transform.position.x, BoundsX[0], BoundsX[1]);
-        pos.z = Mathf.Clamp(transform.position.z, BoundsZ[0], BoundsZ[1]);
-        transform.position = pos;
-
-        // Cache the position
-        lastPanPosition = newPanPosition;
-    }
-
-    void ZoomCamera(float offset, float speed)
-    {
-        if (offset == 0)
-        {
-            return;
-        }
-
-        cam.fieldOfView = Mathf.Clamp(cam.fieldOfView - (offset * speed), ZoomBounds[0], ZoomBounds[1]);
-    }*/
 }

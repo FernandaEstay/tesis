@@ -42,7 +42,7 @@ public class LoadImage : MonoBehaviour {
             else
                 indexSuffix = i.ToString();
 
-            Debug.Log(indexSuffix);
+            //Debug.Log(indexSuffix);
 
             string fullFilename = pathPrefix + pathImageAssets + pathSmall + filename + indexSuffix + fileSuffix;
        
