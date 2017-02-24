@@ -15,6 +15,7 @@ public class scrCamera : MonoBehaviour {
     private Vector3 posfinal;
     private Vector3 pos;
     private GameObject[] containers;
+    private GameObject[] textContainers;
 
     // Use this for initialization
     void Start () {
@@ -23,6 +24,7 @@ public class scrCamera : MonoBehaviour {
 
         posInicial = mainCamera.transform.position;
         posfinal.Set(posInicial.x + (156f * 3f), posInicial.y, posInicial.z);
+
     }
 	
 	// Update is called once per frame
@@ -53,12 +55,26 @@ public class scrCamera : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(1))
         {
+            textContainers = GameObject.FindGameObjectsWithTag("TextContainer");
+            foreach (GameObject text in textContainers)
+            {
+                Text tx = text.GetComponent<Text>();
+                tx.enabled = false;
+
+            }
             Zoom();
         }
         if (Input.GetMouseButtonDown(0))
         {
             zoomCamera.enabled = false;
             mainCamera.enabled = true;
+            textContainers = GameObject.FindGameObjectsWithTag("TextContainer");
+            foreach (GameObject text in textContainers)
+            {
+                Text tx = text.GetComponent<Text>();
+                tx.enabled = true;
+            }
+
         }
     }
 

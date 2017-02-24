@@ -22,7 +22,10 @@ public class ScreenCanvas : MonoBehaviour {
         time += Time.deltaTime;
         min = Mathf.Floor(time / 60);
         seg = time % 60;
-        txtTime.text = "Tiempo: " + min.ToString() + ":" + Mathf.RoundToInt(seg).ToString();
+        if(seg % 10 == 0)
+            txtTime.text = "Tiempo: " + min.ToString() + ": 0" + Mathf.RoundToInt(seg).ToString();
+        else
+            txtTime.text = "Tiempo: " + min.ToString() + ": " + Mathf.RoundToInt(seg).ToString();
     }
 
 

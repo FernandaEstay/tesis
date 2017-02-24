@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class scriptPrefab : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class scriptPrefab : MonoBehaviour
     public float gridY = 5f;
     public int numberPage = 4;
     public float spacing = 13f;
+    public Text[] textContainer;
     private int separationPages = 0;
 
     public GameObject container;
@@ -27,6 +29,7 @@ public class scriptPrefab : MonoBehaviour
                 {
                     Vector3 pos = new Vector3(x + separationPages, y, 0) * spacing;
                     Instantiate(prefab, pos, Quaternion.identity);
+                    
                 }
             }
             separationPages += 12;
@@ -38,7 +41,16 @@ public class scriptPrefab : MonoBehaviour
             Vector3 pos = new Vector3(distX, distY, 0);
             distY += 12f;
             Instantiate(container, pos, Quaternion.identity);
+        }
 
+        int i = 0;
+        GameObject[] containers;
+        containers = GameObject.FindGameObjectsWithTag("container");
+        foreach (Text text in textContainer)
+        {
+            containers[i].name = text.text;
+            text.name = text.text;
+            i += 1;
         }
     }
 
