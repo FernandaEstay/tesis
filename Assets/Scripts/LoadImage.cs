@@ -43,7 +43,7 @@ public class LoadImage : MonoBehaviour {
                 indexSuffix = i.ToString();
 
             //Debug.Log(indexSuffix);
-
+            quad.name = indexSuffix;
             string fullFilename = pathPrefix + pathImageAssets + pathSmall + filename + indexSuffix + fileSuffix;
        
             WWW www = new WWW(fullFilename);

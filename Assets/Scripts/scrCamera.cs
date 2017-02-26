@@ -11,19 +11,22 @@ public class scrCamera : MonoBehaviour {
 
     private Camera mainCamera;
     private Camera zoomCamera;
-    private Vector3 posInicial;
-    private Vector3 posfinal;
+    private Vector3 posInicialCam;
+    private Vector3 posfinalCam;
     private Vector3 pos;
     private GameObject[] containers;
     private GameObject[] textContainers;
+    private GameObject trash;
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         zoomCamera = GameObject.Find("Zoom Camera").GetComponent<Camera>();
+        trash = GameObject.FindGameObjectWithTag("Trash");
 
-        posInicial = mainCamera.transform.position;
-        posfinal.Set(posInicial.x + (156f * 3f), posInicial.y, posInicial.z);
+        posInicialCam = mainCamera.transform.position;
+        posfinalCam.Set(posInicialCam.x + (156f * 3f), posInicialCam.y, posInicialCam.z);
+
 
     }
 	
@@ -31,12 +34,12 @@ public class scrCamera : MonoBehaviour {
 	void Update () {
         if (mainCamera.enabled == true)
         {
-            if (posInicial == mainCamera.transform.position)
+            if (posInicialCam == mainCamera.transform.position)
             {
                 btBack.gameObject.SetActive(false);
                 btNext.gameObject.SetActive(true);
             }
-            else if (posfinal == mainCamera.transform.position)
+            else if (posfinalCam == mainCamera.transform.position)
             {
                 btNext.gameObject.SetActive(false);
                 btBack.gameObject.SetActive(true);
@@ -89,6 +92,10 @@ public class scrCamera : MonoBehaviour {
         pos = mainCamera.transform.position;
         pos.Set(pos.x + 156f, pos.y, pos.z);
         mainCamera.transform.position = pos;
+
+        trash.transform.GetComponent<Renderer>().enabled = true;
+        Vector3 posTrash = new Vector3(trash.transform.position.x + 156f, trash.transform.position.y, trash.transform.position.z);
+        trash.transform.position = posTrash;
     }
     public void BackOnClicEvent()
     {
@@ -101,6 +108,9 @@ public class scrCamera : MonoBehaviour {
         pos = mainCamera.transform.position;
         pos.Set(pos.x - 156f, pos.y, pos.z);
         mainCamera.transform.position = pos;
+
+        Vector3 posTrash = new Vector3(trash.transform.position.x - 156f, trash.transform.position.y, trash.transform.position.z);
+        trash.transform.position = posTrash;
     }
     private void Zoom()
     {
@@ -108,7 +118,7 @@ public class scrCamera : MonoBehaviour {
         Debug.DrawRay(ray.origin, ray.direction * 100, Color.cyan);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit) == true)
+        if (Physics.Raycast(ray, out hit) == true && hit.transform.tag == "photo")
         {
             mainCamera.enabled = false;
             zoomCamera.enabled = true;
