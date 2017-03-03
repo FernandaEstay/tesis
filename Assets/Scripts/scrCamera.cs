@@ -115,7 +115,6 @@ public class scrCamera : MonoBehaviour {
     private void Zoom()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * 100, Color.cyan);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit) == true && hit.transform.tag == "photo")

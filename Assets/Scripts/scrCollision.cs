@@ -6,33 +6,47 @@ using UnityEngine.UI;
 
 public class scrCollision : MonoBehaviour
 {
-    private GameObject[] texts;
-    private List<string> listPhotos;
-    private List<string> listPhotosSelected;
     private GameObject trash;
+    private List<string> photosSelected;
     private GameObject[] photos;
 
+    private static List<List<string>> listPhotos;
+    private static int locked = 0;
+    private static GameObject[] texts;
 
     // Use this for initialization
     void Start()
     {
-        listPhotos = new List<string>();
-        listPhotosSelected = new List<string>();
+        //photosSelected = new List<string>();
+
+        listPhotos = new List<List<string>>();
+
+        //locker = true;
+        texts = GameObject.FindGameObjectsWithTag("TextContainer");
+
+        //inicializar listas de fotos
+        foreach (GameObject text in texts)
+        {
+            List<string> photos = new List<string>();
+            photos.Add(text.name);
+            listPhotos.Add(photos);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (listPhotos.Count != 0)
-        {
-            if (Input.GetMouseButtonDown(1) )
-                Delete();
-            if(Input.GetMouseButtonDown(0) )
-                reverseDelete();
-        }
 
     }
 
+    private void OnMouseOver()
+    {
+        UpdateAllTextContainer();
+        if (Input.GetMouseButtonDown(1))
+            Delete();
+        if (Input.GetMouseButtonDown(0))
+            reverseDelete();
+    }
     private void reverseDelete()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -40,90 +54,107 @@ public class scrCollision : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit) == true)
         {
-            if(hit.transform.GetComponent<Renderer>().material.color == Color.cyan)
+            if (hit.transform.GetComponent<Renderer>().material.color == Color.cyan)
             {
-                hit.transform.GetComponent<Renderer>().material.color = Color.white;
-                trash = GameObject.FindGameObjectWithTag("Trash");
-                trash.transform.GetComponent<Renderer>().enabled = false;
-
-                photos = GameObject.FindGameObjectsWithTag("photo");
-                foreach (GameObject photo in photos)
+                if (locked == 1)
                 {
-                    Renderer rendererPhoto = photo.transform.GetComponent<Renderer>();
-                    if (listPhotosSelected.Contains(rendererPhoto.name))
-                    {
-                        rendererPhoto.enabled = false;
-                    }
-                    else if (listPhotos.Contains(rendererPhoto.name))
-                    {
-                        if(rendererPhoto.enabled == true)
-                            rendererPhoto.enabled = false;
-                        else
-                            listPhotos.Remove(rendererPhoto.name);
-                    }
-                    else
-                        rendererPhoto.enabled = true;
-                }
 
+                    hit.transform.GetComponent<Renderer>().material.color = Color.white;
+                    /*
+                    trash = GameObject.FindGameObjectWithTag("Trash");
+                    trash.transform.GetComponent<Renderer>().enabled = false;*/
+
+                    photos = GameObject.FindGameObjectsWithTag("photo");
+                    foreach (GameObject photo in photos)
+                    {
+                        Renderer rendererPhoto = photo.transform.GetComponent<Renderer>();
+                        rendererPhoto.enabled = true;
+                    }
+
+                    locked = 0;
+                }
             }
+            
         }
     }
     void Delete()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit) == true)
+        if (locked == 0)
         {
-            Renderer rendContainer = hit.transform.GetComponent<Renderer>();
-            rendContainer.material.color = Color.cyan;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-            trash = GameObject.FindGameObjectWithTag("Trash");
-            trash.transform.GetComponent<Renderer>().enabled = true;
-
-            photos = GameObject.FindGameObjectsWithTag("photo");
-            foreach (GameObject photo in photos)
+            if (Physics.Raycast(ray, out hit) == true)
             {
-                Renderer rendererPhoto = photo.transform.GetComponent<Renderer>();
-                if (listPhotos.Contains(photo.name))
-                {
-                    rendererPhoto.enabled = true;
-                }
-                else if(rendererPhoto.enabled == false)
-                {
-                    listPhotosSelected.Add(rendererPhoto.name);
-                }
-                else
-                {
-                    rendererPhoto.enabled = false;
-                }
-            }
+                Renderer rendContainer = hit.transform.GetComponent<Renderer>();
+                rendContainer.material.color = Color.cyan;
 
+                photos = GameObject.FindGameObjectsWithTag("photo");
+
+                /*trash = GameObject.FindGameObjectWithTag("Trash");
+                trash.transform.GetComponent<Renderer>().enabled = true;*/
+
+                List<string> photosSelected = null;
+                foreach (List<string> list in listPhotos)
+                {
+                    if (list[0] == rendContainer.name)
+                    {
+                        photosSelected = list;
+                    }
+                }
+                foreach (List<string> list in listPhotos)
+                {
+
+                }
+                photos = GameObject.FindGameObjectsWithTag("photo");
+                for (int i = 0; i < photos.Length; i++)
+                {
+                    Renderer rendererPhoto = photos[i].transform.GetComponent<Renderer>();
+                    if (photosSelected.Contains(rendererPhoto.name) == true)
+                    {
+                        rendererPhoto.enabled = true;
+                    }
+                    else
+                    {
+                        rendererPhoto.enabled = false;
+                    }
+                }
+
+            }
+            UpdateAllTextContainer();
+            locked = 1;
         }
     }
 
     void OnTriggerStay(Collider other)
     {
-        if(Input.GetMouseButtonUp(0)){
-            Renderer renderer = other.transform.GetComponent<Renderer>();
-            renderer.enabled = false;
-            if (!listPhotos.Contains(renderer.name))
+        if (Input.GetMouseButtonUp(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit) == true)
             {
-                listPhotos.Add(renderer.name);
 
-                texts = GameObject.FindGameObjectsWithTag("TextContainer");
+                Renderer renderer = other.transform.GetComponent<Renderer>();
 
-                foreach (GameObject tc in texts)
+
+                foreach (List<string> list in listPhotos)
                 {
-                    if (tc.name.ToString() == transform.name.ToString())
+                    if (list[0] == hit.transform.name.ToString())
                     {
-                        Text text = tc.GetComponent<Text>();
-                        text.text = text.name + " :" + listPhotos.Count;
+                        if (list.Contains(renderer.name) == false)
+                        {
+                            list.Add(renderer.name);
+
+                            UpdateTextContainer(hit.transform.name.ToString());
+                        }
                         break;
                     }
                 }
+
             }
-            
+
         }
     }
     void OnTriggerEnter(Collider other)
@@ -135,5 +166,76 @@ public class scrCollision : MonoBehaviour
     {
         Renderer rend = transform.GetComponent<Renderer>();
         rend.material.color = Color.white;
+    }
+
+    public static bool RemovePhotosSelected(string nameContainer, string namePhoto)
+    {
+        foreach (List<string> list in listPhotos)
+        {
+            if (list[0] == nameContainer)
+            {
+                list.Remove(namePhoto);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static string GetNameContainer()
+    {
+        GameObject[] containers = GameObject.FindGameObjectsWithTag("container");
+        foreach (GameObject cont in containers)
+        {
+            if(cont.transform.GetComponent<Renderer>().material.color == Color.cyan)
+            {
+                return cont.transform.name;
+            }
+        }
+        return null;
+    }
+    public static void UpdateTextContainer(string nameContainer)
+    {
+        foreach (List<string> list in listPhotos)
+        {
+            if (list[0] == nameContainer)
+            {
+                foreach (GameObject tc in texts)
+                {
+                    if (tc.name.ToString() == nameContainer)
+                    {
+                        Text text = tc.GetComponent<Text>();
+                        text.text = text.name + " :" + (list.Count - 1);
+                        text.enabled = true;
+                        break;
+                    }
+                   
+                }
+                
+                break;
+            }
+        }
+    }
+
+    public void UpdateAllTextContainer()
+    {
+        foreach (List<string> list in listPhotos)
+        {
+             foreach (GameObject tc in texts)
+             {
+                    if (tc.name.ToString() == list[0])
+                    {
+                        Text text = tc.GetComponent<Text>();
+                        text.text = text.name + " :" + (list.Count - 1);
+                        text.enabled = true;
+                        break;
+                    }
+             }
+
+        }
+    }
+
+    public static void SetLocked(int value)
+    {
+        locked = value;
     }
 }
