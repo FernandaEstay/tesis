@@ -17,17 +17,17 @@ public class scrCamera : MonoBehaviour {
     private GameObject[] containers;
     private GameObject[] textContainers;
     private GameObject trash;
+    private Vector3 velocityNext = new Vector3(6f, 0f, 0f); //posicion x debe ser divisor de 156f
+    private Vector3 velocityBack = new Vector3(-6f, 0f, 0f); //posicion x debe ser divisor de 156f
 
     // Use this for initialization
     void Start() {
         mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
-        zoomCamera = GameObject.Find("Zoom Camera").GetComponent<Camera>();
+        //zoomCamera = GameObject.Find("Zoom Camera").GetComponent<Camera>();
         trash = GameObject.FindGameObjectWithTag("Trash");
 
         posInicialCam = mainCamera.transform.position;
         posfinalCam.Set(posInicialCam.x + (156f * 3f), posInicialCam.y, posInicialCam.z);
-
-
     }
 	
 	// Update is called once per frame
@@ -56,63 +56,89 @@ public class scrCamera : MonoBehaviour {
             btNext.gameObject.SetActive(false);
         }
 
-        if (Input.GetMouseButtonDown(1))
+        /*if (Input.GetMouseButtonDown(1))
         {
-            textContainers = GameObject.FindGameObjectsWithTag("TextContainer");
-            foreach (GameObject text in textContainers)
-            {
-                Text tx = text.GetComponent<Text>();
-                tx.enabled = false;
-
-            }
+            EnableTextContainer(false);
             Zoom();
         }
         if (Input.GetMouseButtonDown(0))
         {
             zoomCamera.enabled = false;
             mainCamera.enabled = true;
-            textContainers = GameObject.FindGameObjectsWithTag("TextContainer");
-            foreach (GameObject text in textContainers)
-            {
-                Text tx = text.GetComponent<Text>();
-                tx.enabled = true;
-            }
+            EnableTextContainer(true);
 
-        }
+        }*/
     }
 
     public void NextOnClicEvent()
     {
-        containers = GameObject.FindGameObjectsWithTag("container");
-        foreach(GameObject cont in containers)
-        {
-            Vector3 contPos = new Vector3(cont.transform.position.x + 156f, cont.transform.position.y, cont.transform.position.z);
-            cont.transform.position = contPos;
-        }
-        pos = mainCamera.transform.position;
-        pos.Set(pos.x + 156f, pos.y, pos.z);
-        mainCamera.transform.position = pos;
-
-        trash.transform.GetComponent<Renderer>().enabled = true;
-        Vector3 posTrash = new Vector3(trash.transform.position.x + 156f, trash.transform.position.y, trash.transform.position.z);
-        trash.transform.position = posTrash;
+        MoveContainer(156f);
+        StartCoroutine(MoveCameraNext(mainCamera, 156f));
+        moveObjectX(trash, 156f);
     }
+
     public void BackOnClicEvent()
+    {
+        MoveContainer(-156f);   
+        StartCoroutine(MoveCameraBack(mainCamera, -156f));
+        moveObjectX(trash, -156f);
+    }
+
+    private void MoveContainer(float x)
     {
         containers = GameObject.FindGameObjectsWithTag("container");
         foreach (GameObject cont in containers)
         {
-            Vector3 contPos = new Vector3(cont.transform.position.x - 156f, cont.transform.position.y, cont.transform.position.z);
-            cont.transform.position = contPos;
+            moveObjectX(cont, x);
         }
-        pos = mainCamera.transform.position;
-        pos.Set(pos.x - 156f, pos.y, pos.z);
-        mainCamera.transform.position = pos;
-
-        Vector3 posTrash = new Vector3(trash.transform.position.x - 156f, trash.transform.position.y, trash.transform.position.z);
-        trash.transform.position = posTrash;
     }
-    private void Zoom()
+    private void moveObjectX(GameObject obj, float value)
+    {
+        Vector3 position = new Vector3(obj.transform.position.x + value, obj.transform.position.y, obj.transform.position.z);
+        obj.transform.position = position;
+    }
+
+
+    IEnumerator MoveCameraNext(Camera cam, float value)
+    {
+        EnableTextContainer(false);
+        Vector3 posFinal = cam.transform.position;
+        posFinal.Set(posFinal.x + value, posFinal.y, posFinal.z);
+        while(cam.transform.position.x < posFinal.x - 1f)
+        {
+            cam.transform.Translate(velocityNext.x , 0, 0);
+            yield return null;
+        }
+        EnableTextContainer(true);
+
+    }
+
+    IEnumerator MoveCameraBack(Camera cam, float value)
+    {
+        EnableTextContainer(false);
+        Vector3 posFinal = cam.transform.position;
+        posFinal.Set(posFinal.x + value, posFinal.y, posFinal.z);
+        while (cam.transform.position.x - 1f > posFinal.x)
+        {
+            cam.transform.Translate(velocityBack.x, 0, 0);
+            yield return null;
+        }
+        EnableTextContainer(true);
+
+    }
+
+    private void EnableTextContainer(bool value)
+    {
+        textContainers = GameObject.FindGameObjectsWithTag("TextContainer");
+        foreach (GameObject text in textContainers)
+        {
+            Text tx = text.GetComponent<Text>();
+            tx.enabled = value;
+
+        }
+    } 
+
+    /*private void Zoom()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -123,5 +149,5 @@ public class scrCamera : MonoBehaviour {
             zoomCamera.enabled = true;
             zoomCamera.transform.position = new Vector3(hit.transform.position.x, hit.transform.position.y, -10f);
         }
-    }
+    }*/
 }
