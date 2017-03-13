@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class scrCollision : MonoBehaviour
 {
     private GameObject trash;
@@ -13,6 +14,8 @@ public class scrCollision : MonoBehaviour
     private static List<List<string>> listPhotos;
     private static int locked = 0;
     private static GameObject[] texts;
+    public static GameObject containerDelete = null;
+    private Color colorContainer;
 
     // Use this for initialization
     void Start()
@@ -31,6 +34,16 @@ public class scrCollision : MonoBehaviour
             photos.Add(text.name);
             listPhotos.Add(photos);
         }
+
+        //inicializar colores de container
+        GameObject[] containers = GameObject.FindGameObjectsWithTag("container");
+        ChangeColorContainer(containers[0], Color.cyan);
+        ChangeColorContainer(containers[1], Color.green);
+        ChangeColorContainer(containers[2], Color.magenta);
+        ChangeColorContainer(containers[3], Color.yellow);
+
+
+
     }
 
     // Update is called once per frame
@@ -42,10 +55,66 @@ public class scrCollision : MonoBehaviour
     private void OnMouseOver()
     {
         UpdateAllTextContainer();
-        if (Input.GetMouseButtonDown(1))
-            Delete();
         if (Input.GetMouseButtonDown(0))
-            reverseDelete();
+        { 
+            if (Raycast.GetPhotoZoom() == null)
+            {
+                if (locked == 0)
+                    Delete();
+                else
+                    reverseDelete();
+            }
+            else
+            {
+                SelectPhoto(Raycast.GetPhotoZoom());
+            }
+        }
+     
+    }
+
+    public void SelectPhoto(GameObject photo)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit) == true)
+        {
+
+            Renderer renderer = photo.transform.GetComponent<Renderer>();
+
+            foreach (List<string> list in listPhotos)
+            {
+                if (list[0] == hit.transform.name.ToString())
+                {
+                    if (list.Contains(renderer.name) == false)
+                    {
+                        list.Add(renderer.name);
+
+                        Raycast photoInstance = GameObject.Find(Raycast.GetPhotoZoom().transform.name).GetComponent<Raycast>();
+                        photoInstance.CreateMarcadorPhoto(Raycast.GetPhotoZoom(), hit.transform.gameObject.GetComponent<Renderer>().material.color);
+
+                        UpdateTextContainer(hit.transform.name.ToString());
+                    }
+                    break;
+                }
+            }
+            /*colorContainer = transform.GetComponent<Renderer>().material.color;
+            Debug.Log("luego del while" + colorContainer);
+            StartCoroutine(MarcarContainer(hit.transform.gameObject));
+            Debug.Log("luego del while" + colorContainer);
+            hit.transform.GetComponent<Renderer>().material.color = colorContainer;*/
+        }
+    }
+
+    IEnumerator MarcarContainer(GameObject cont)
+    {
+        int i = 0;
+        cont.transform.GetComponent<Renderer>().material.color = Color.red;
+        while (i < 100)
+        {
+            yield return null;
+        }
+        
     }
     private void reverseDelete()
     {
@@ -54,12 +123,13 @@ public class scrCollision : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit) == true)
         {
-            if (hit.transform.GetComponent<Renderer>().material.color == Color.cyan)
+            if (hit.transform.gameObject == containerDelete)
             {
                 if (locked == 1)
                 {
 
-                    hit.transform.GetComponent<Renderer>().material.color = Color.white;
+                    containerDelete = null;
+                    //hit.transform.GetComponent<Renderer>().material.color = Color.white;
                     /*
                     trash = GameObject.FindGameObjectWithTag("Trash");
                     trash.transform.GetComponent<Renderer>().enabled = false;*/
@@ -69,6 +139,14 @@ public class scrCollision : MonoBehaviour
                     {
                         Renderer rendererPhoto = photo.transform.GetComponent<Renderer>();
                         rendererPhoto.enabled = true;
+                        int child = photo.transform.childCount;
+                        for(int i = 0; i<child; i++)
+                        {
+                            if(photo.transform.GetChild(i).transform.GetComponent<Renderer>().enabled == false)
+                            {
+                                photo.transform.GetChild(i).transform.GetComponent<Renderer>().enabled = true;
+                            }
+                        }
                     }
 
                     locked = 0;
@@ -87,7 +165,7 @@ public class scrCollision : MonoBehaviour
             if (Physics.Raycast(ray, out hit) == true)
             {
                 Renderer rendContainer = hit.transform.GetComponent<Renderer>();
-                rendContainer.material.color = Color.cyan;
+                //rendContainer.material.color = Color.cyan;
 
                 photos = GameObject.FindGameObjectsWithTag("photo");
 
@@ -102,10 +180,6 @@ public class scrCollision : MonoBehaviour
                         photosSelected = list;
                     }
                 }
-                foreach (List<string> list in listPhotos)
-                {
-
-                }
                 photos = GameObject.FindGameObjectsWithTag("photo");
                 for (int i = 0; i < photos.Length; i++)
                 {
@@ -117,55 +191,19 @@ public class scrCollision : MonoBehaviour
                     else
                     {
                         rendererPhoto.enabled = false;
+                        int child = photos[i].transform.childCount;
+                        for(int y = 0; y<child; y++)
+                        {
+                            photos[i].transform.GetChild(y).transform.GetComponent<Renderer>().enabled = false;
+                        }
                     }
                 }
+                containerDelete = hit.transform.gameObject;
 
             }
             UpdateAllTextContainer();
             locked = 1;
         }
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        if (Input.GetMouseButtonUp(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit) == true)
-            {
-
-                Renderer renderer = other.transform.GetComponent<Renderer>();
-
-
-                foreach (List<string> list in listPhotos)
-                {
-                    if (list[0] == hit.transform.name.ToString())
-                    {
-                        if (list.Contains(renderer.name) == false)
-                        {
-                            list.Add(renderer.name);
-
-                            UpdateTextContainer(hit.transform.name.ToString());
-                        }
-                        break;
-                    }
-                }
-
-            }
-
-        }
-    }
-    void OnTriggerEnter(Collider other)
-    {
-        Renderer rend = transform.GetComponent<Renderer>();
-        rend.material.color = Color.red;
-    }
-    void OnTriggerExit(Collider other)
-    {
-        Renderer rend = transform.GetComponent<Renderer>();
-        rend.material.color = Color.white;
     }
 
     public static bool RemovePhotosSelected(string nameContainer, string namePhoto)
@@ -181,17 +219,20 @@ public class scrCollision : MonoBehaviour
         return false;
     }
 
-    public static string GetNameContainer()
+    public static List<string> PhotosContainer(string nameContainer)
     {
-        GameObject[] containers = GameObject.FindGameObjectsWithTag("container");
-        foreach (GameObject cont in containers)
+        foreach (List<string> list in listPhotos)
         {
-            if(cont.transform.GetComponent<Renderer>().material.color == Color.cyan)
+            if (list[0] == nameContainer)
             {
-                return cont.transform.name;
+                return list;
             }
         }
         return null;
+    }
+    public static GameObject GetContainerDelete()
+    {
+        return containerDelete;
     }
     public static void UpdateTextContainer(string nameContainer)
     {
@@ -234,8 +275,59 @@ public class scrCollision : MonoBehaviour
         }
     }
 
+
+    public void ChangeColorContainer(GameObject cont, Color color)
+    {
+        Renderer rend = cont.transform.GetComponent<Renderer>();
+        rend.material.color = color;
+    }
+
     public static void SetLocked(int value)
     {
         locked = value;
     }
 }
+
+/*
+void OnTriggerStay(Collider other)
+{
+    if (Input.GetMouseButtonUp(0))
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit) == true)
+        {
+
+            Renderer renderer = other.transform.GetComponent<Renderer>();
+
+
+            foreach (List<string> list in listPhotos)
+            {
+                if (list[0] == hit.transform.name.ToString())
+                {
+                    if (list.Contains(renderer.name) == false)
+                    {
+                        list.Add(renderer.name);
+
+                        UpdateTextContainer(hit.transform.name.ToString());
+                    }
+                    break;
+                }
+            }
+
+        }
+
+    }
+}
+void OnTriggerEnter(Collider other)
+{
+    Renderer rend = transform.GetComponent<Renderer>();
+    rend.material.color = Color.red;
+}
+void OnTriggerExit(Collider other)
+{
+    Renderer rend = transform.GetComponent<Renderer>();
+    rend.material.color = Color.white;
+}
+*/

@@ -11,10 +11,13 @@ public class Raycast : MonoBehaviour {
     private Vector3 posInicialCam;
     private Camera mainCamera;
     */
-    private Vector3 posInicial;
+    public Vector3 posInicial;
     private Vector3 offset;
     private Vector3 posMax;
-    public static int lockPhoto = 0;
+    public static GameObject photoSelected = null;
+
+    public GameObject prefabMarcador;
+
 
     // Use this for initialization
     void Start ()
@@ -38,32 +41,26 @@ public class Raycast : MonoBehaviour {
         }
 
     }
-    private void Zoom()
+    public void Zoom()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit) == true)
         {
-            if (lockPhoto == 0)
+            if (photoSelected == null)
             {
-                Debug.Log(lockPhoto);
-                lockPhoto = 1;
-                Debug.Log(lockPhoto);
                 StartCoroutine(ZoomIn(hit));
             }
-            else if(lockPhoto == 1)
+            else if(photoSelected.name == hit.transform.name)
             {
-                Debug.Log(lockPhoto);
-                lockPhoto = 0;
                 StartCoroutine(ZoomOut(hit, posInicial));
-                Debug.Log(lockPhoto);
             }
         }
     }
     IEnumerator ZoomIn(RaycastHit photo)
     {
-        Debug.Log(lockPhoto);
+        photoSelected = photo.transform.gameObject;
         while (photo.transform.position.z > posMax.z)
         {
             Vector3 posCam = Camera.main.transform.position;
@@ -72,22 +69,72 @@ public class Raycast : MonoBehaviour {
             photo.transform.position = Vector3.MoveTowards(photo.transform.position, posCam, step);
             yield return null;
         }
-        Debug.Log(lockPhoto);
+        PhotosChangeColor(photo.transform.gameObject, Color.grey);
     }
 
     IEnumerator ZoomOut(RaycastHit photo, Vector3 posInicial)
     {
-        Debug.Log(posInicial);
         while (photo.transform.position.z < posInicial.z)
         {
             float step = 5f;
             photo.transform.position = Vector3.MoveTowards(photo.transform.position, posInicial, step);
             yield return null;
         }
-        Debug.Log(lockPhoto);
+        PhotosChangeColor(photo.transform.gameObject, Color.white);
+        photoSelected = null;
+    }
+    private void ObjectChangeColor(GameObject obj, Color color)
+    {
+        Renderer rend = obj.transform.GetComponent<Renderer>();
+        rend.material.color = color;
+    }
+
+    private void PhotosChangeColor(GameObject except, Color color)
+    {
+        GameObject[] photos = GameObject.FindGameObjectsWithTag("photo");
+
+        foreach(GameObject photo in photos)
+        {
+            if(photo.name != except.name)
+            {
+                ObjectChangeColor(photo, color);
+            }
+        }
+    }
+    
+
+    public void CreateMarcadorPhoto(GameObject photo, Color color)
+    {
+
+
+        GameObject obj = Instantiate(prefabMarcador) as GameObject;
+        obj.transform.parent = photo.transform;
+
+        int i = photo.transform.childCount;
+
+        photo.transform.GetChild(i - 1).transform.position = new Vector3(photo.transform.position.x - 3.75f + ((i-1) * 2.5f), photo.transform.position.y - 4, -45f);
+        obj.transform.GetComponent<Renderer>().material.color = color;
 
     }
-    /*private void OnMouseDown()
+    public static GameObject GetPhotoZoom()
+    {
+        return photoSelected;
+    }
+
+    public static void SetDeletePhotoSelected()
+    {
+        photoSelected = null;
+    }
+    public void SetPositionPhoto(GameObject photo)
+    {
+        photo.transform.position = posInicial;
+        PhotosChangeColor(photo, Color.white);
+    }
+    /*public static void SetPositionPhotoDelete(Vector3 posInicial)
+    {
+        photoSelected.transform.position = posInicial;
+    }
+    private void OnMouseDown()
     {
         dist = mainCamera.WorldToScreenPoint(transform.position);
         posX = Input.mousePosition.x - dist.x;
