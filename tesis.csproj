@@ -75,9 +75,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="tesis.Plugins.csproj">
+      <Project>{DA9613E9-5003-E955-5C37-7911B3139265}</Project>
+      <Name>tesis.Plugins</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\KinectView\Scripts\BodySourceManager.cs" />
+    <Compile Include="Assets\KinectView\Scripts\BodySourceView.cs" />
+    <Compile Include="Assets\KinectView\Scripts\ColorSourceManager.cs" />
+    <Compile Include="Assets\KinectView\Scripts\ColorSourceView.cs" />
+    <Compile Include="Assets\KinectView\Scripts\DepthSourceManager.cs" />
+    <Compile Include="Assets\KinectView\Scripts\DepthSourceView.cs" />
+    <Compile Include="Assets\KinectView\Scripts\DisableOnStart.cs" />
+    <Compile Include="Assets\KinectView\Scripts\InfraredSourceManager.cs" />
+    <Compile Include="Assets\KinectView\Scripts\InfraredSourceView.cs" />
+    <Compile Include="Assets\KinectView\Scripts\MultiSourceManager.cs" />
     <Compile Include="Assets\Scripts\LoadImage.cs" />
     <Compile Include="Assets\Scripts\Raycast.cs" />
     <Compile Include="Assets\Scripts\ScrDelete.cs" />
+    <Compile Include="Assets\Scripts\ScrManagerKinect.cs" />
+    <Compile Include="Assets\Scripts\ScrManagerView.cs" />
     <Compile Include="Assets\Scripts\ScreenCanvas.cs" />
     <Compile Include="Assets\Scripts\scrCamera.cs" />
     <Compile Include="Assets\Scripts\scrCollision.cs" />
