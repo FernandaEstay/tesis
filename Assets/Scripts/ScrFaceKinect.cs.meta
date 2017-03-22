@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1847c55fe4720f441b207624312f171f
+timeCreated: 1490210922
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - BodySrcManager: {fileID: 1904435751692018, guid: 40b5a68ccafef824aa96c668bb941502,
+      type: 2}
+  - marcador: {fileID: 1860412349556624, guid: ee52e7117522ad447a6110174b7c29dd, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

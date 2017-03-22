@@ -122,9 +122,10 @@ public class BodySourceView : MonoBehaviour
             GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             
             LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
+            lr.numPositions = 2;
             lr.material = BoneMaterial;
-            lr.SetWidth(1f, 1f);
+            lr.startWidth = 1f;
+            lr.endWidth = 1f;
             
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
@@ -156,7 +157,8 @@ public class BodySourceView : MonoBehaviour
             {
                 lr.SetPosition(0, jointObj.localPosition);
                 lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
-                lr.SetColors(GetColorForState (sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
+                lr.startColor = GetColorForState(sourceJoint.TrackingState);
+                lr.endColor = GetColorForState(targetJoint.Value.TrackingState);
             }
             else
             {

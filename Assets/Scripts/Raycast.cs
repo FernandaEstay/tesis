@@ -48,6 +48,7 @@ public class Raycast : MonoBehaviour {
 
         if (Physics.Raycast(ray, out hit) == true)
         {
+
             if (photoSelected == null)
             {
                 StartCoroutine(ZoomIn(hit));
@@ -56,6 +57,7 @@ public class Raycast : MonoBehaviour {
             {
                 StartCoroutine(ZoomOut(hit, posInicial));
             }
+            
         }
     }
     IEnumerator ZoomIn(RaycastHit photo)
