@@ -97,6 +97,7 @@
     <Compile Include="Assets\Scripts\ScrDetectHead.cs" />
     <Compile Include="Assets\Scripts\ScrFaceKinect.cs" />
     <Compile Include="Assets\Scripts\ScrHDFace.cs" />
+    <Compile Include="Assets\Scripts\ScrZoomKinect.cs" />
     <Compile Include="Assets\Scripts\ScreenCanvas.cs" />
     <Compile Include="Assets\Scripts\scrCamera.cs" />
     <Compile Include="Assets\Scripts\scrCollision.cs" />
